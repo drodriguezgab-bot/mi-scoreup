@@ -103,4 +103,78 @@ header{position:sticky;top:0;z-index:200;background:rgba(18,20,24,0.97);backdrop
 @media(max-width:900px){.main{grid-template-columns:1fr}.col-right{display:none}.cards-grid{grid-template-columns:1fr}.bottom-nav{display:block}body{padding-bottom:64px}}
 </style>
 </head>
+<body>
+<header>
+  <a class="logo" href="#"><span class="logo-s">S</span><span class="logo-rest">COREUP</span></a>
+  <div class="live-indicator"><div class="live-dot"></div>En Vivo</div>
+</header>
+<div class="sport-tabs">
+  <div class="sport-tab football active" onclick="switchSport('football')">Fútbol</div>
+  <div class="sport-tab basketball" onclick="switchSport('basketball')">Baloncesto</div>
+</div>
+<div class="main">
+  <div class="sport-panel active" id="panel-football">
+    <div class="col-left">
+      <div>
+        <div class="sec-header"><span class="sec-title">Partidos <span class="football">Recientes</span></span></div>
+        <div id="football-matches"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
+      </div>
+      <div>
+        <div class="sec-header"><span class="sec-title">Próximos <span class="football">Partidos</span></span></div>
+        <div id="football-next"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
+      </div>
+    </div>
+    <div class="col-right">
+      <div id="football-standings"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
+      <div id="football-players"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
+    </div>
+  </div>
+  <div class="sport-panel" id="panel-basketball">
+    <div class="col-left">
+      <div>
+        <div class="sec-header"><span class="sec-title">Partidos <span class="basketball">Recientes</span></span></div>
+        <div id="basketball-matches"><div class="loading-box"><div class="spinner blue"></div><div class="loading-text">Cargando...</div></div></div>
+      </div>
+      <div>
+        <div class="sec-header"><span class="sec-title">Próximos <span class="basketball">Partidos</span></span></div>
+        <div id="basketball-next"><div class="loading-box"><div class="spinner blue"></div><div class="loading-text">Cargando...</div></div></div>
+      </div>
+    </div>
+    <div class="col-right">
+      <div id="basketball-standings"><div class="loading-box"><div class="spinner blue"></div><div class="loading-text">Cargando...</div></div></div>
+      <div id="basketball-players"><div class="loading-box"><div class="spinner blue"></div><div class="loading-text">Cargando...</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="updated-bar" id="updated-bar"></div>
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <div class="bn-item active"><div class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div><div class="bn-label">En Vivo</div></div>
+    <div class="bn-item"><div class="bn-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div class="bn-label">Resultados</div></div>
+    <div class="bn-item"><div class="bn-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><div class="bn-label">Stats</div></div>
+    <div class="bn-item"><div class="bn-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="bn-label">Favoritos</div></div>
+    <div class="bn-item"><div class="bn-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="bn-label">Perfil</div></div>
+  </div>
+</nav>
+<script>
+const API='https://www.thesportsdb.com/api/v1/json/123';
+function switchSport(sport){document.querySelectorAll('.sport-tab').forEach(t=>t.classList.remove('active'));document.querySelector('.sport-tab.'+sport).classList.add('active');document.querySelectorAll('.sport-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-'+sport).classList.add('active')}
+function formatDate(str){if(!str)return'';const d=new Date(str);return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'})}
+function formatTime(dateStr,timeStr){if(!dateStr)return'';const dt=new Date(dateStr+'T'+(timeStr||'00:00:00')+'Z');return dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Madrid'})}
+function initials(name){if(!name)return'?';return name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()}
+function statusBadge(status,time,dateStr){if(status==='Match Finished')return'<span class="card-status ft">Fin.</span>';if(status==='In Progress'||status==='HT')return'<span class="card-status live">'+(status==='HT'?'HT':'En vivo')+'</span>';const t=formatTime(dateStr,time);return'<span class="card-status upcoming">'+(t||'Próximo')+'</span>'}
+function errorBox(msg){return'<div class="error-box"><p><strong>Sin datos</strong>'+msg+'</p></div>'}
+async function loadFootballMatches(){try{const r=await fetch(API+'/eventspastleague.php?id=4328');const data=await r.json();const events=(data.events||[]).slice(-8).reverse();if(!events.length)throw new Error();document.getElementById('football-matches').innerHTML='<div class="cards-grid">'+events.map(e=>'<div class="match-card football"><div class="card-top"><span class="card-comp">'+( e.strLeague||'Premier League')+'</span>'+statusBadge(e.strStatus,e.strTime,e.dateEvent)+'</div><div class="card-match"><span class="card-team-name">'+e.strHomeTeam+'</span><span class="card-score football">'+(e.intHomeScore??'')+' - '+(e.intAwayScore??'')+'</span><span class="card-team-name right">'+e.strAwayTeam+'</span></div><div class="card-venue">'+(e.strVenue||'')+' '+formatDate(e.dateEvent)+'</div></div>').join('')+'</div>'}catch(e){document.getElementById('football-matches').innerHTML=errorBox('No se pudieron cargar los partidos.')}}
+async function loadFootballNext(){try{const r=await fetch(API+'/eventsnextleague.php?id=4328');const data=await r.json();const events=(data.events||[]).slice(0,6);if(!events.length)throw new Error();document.getElementById('football-next').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title football">Premier League</span><span class="widget-sub">Próximos</span></div>'+events.map(e=>'<div class="next-item"><div class="next-teams">'+e.strHomeTeam+'<span>vs</span>'+e.strAwayTeam+'</div><div class="next-date"><strong>'+formatTime(e.dateEvent,e.strTime)+'</strong>'+formatDate(e.dateEvent)+'</div></div>').join('')+'</div>'}catch(e){document.getElementById('football-next').innerHTML=errorBox('No se pudieron cargar.')}}
+async function loadFootballStandings(){try{const r=await fetch(API+'/lookuptable.php?l=4328');const data=await r.json();const table=(data.table||[]).slice(0,8);if(!table.length)throw new Error();document.getElementById('football-standings').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title football">Premier League</span><span class="widget-sub">Clasificación</span></div><div class="standings-head"><span>#</span><span>Club</span><span>PJ</span><span>G</span><span>P</span><span>Pts</span></div>'+table.map((t,i)=>'<div class="standing-row '+(i<4?'top-f':'')+'"><span class="rk">'+t.intRank+'</span><span class="club">'+t.strTeam+'</span><span>'+t.intPlayed+'</span><span>'+t.intWin+'</span><span>'+t.intLoss+'</span><span class="pts-f">'+t.intPoints+'</span></div>').join('')+'</div>'}catch(e){document.getElementById('football-standings').innerHTML=errorBox('No se pudo cargar la tabla.')}}
+async function loadFootballPlayers(){try{const r=await fetch(API+'/lookup_all_players.php?id=133604');const data=await r.json();const players=(data.player||[]).filter(p=>p.strPosition&&p.strPosition!=='Goalkeeper').slice(0,5);if(!players.length)throw new Error();document.getElementById('football-players').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title football">Jugadores</span><span class="widget-sub">Arsenal FC</span></div>'+players.map((p,i)=>'<div class="scorer-item"><span class="scorer-rank '+(i<2?'top-f':'dim')+'">'+(i+1)+'</span><div class="scorer-avatar">'+initials(p.strPlayer)+'</div><div class="scorer-info"><div class="scorer-name">'+p.strPlayer+'</div><div class="scorer-club">'+(p.strPosition||'')+' '+(p.strNationality||'')+'</div></div><div class="scorer-stat"><span class="num f">'+(p.strNumber||'-')+'</span><span class="lbl">dorsal</span></div></div>').join('')+'</div>'}catch(e){document.getElementById('football-players').innerHTML=errorBox('No se pudieron cargar.')}}
+async function loadBasketballMatches(){try{const r=await fetch(API+'/eventspastleague.php?id=4387');const data=await r.json();const events=(data.events||[]).slice(-8).reverse();if(!events.length)throw new Error();document.getElementById('basketball-matches').innerHTML='<div class="cards-grid">'+events.map(e=>'<div class="match-card basketball"><div class="card-top"><span class="card-comp">NBA</span>'+statusBadge(e.strStatus,e.strTime,e.dateEvent)+'</div><div class="card-match"><span class="card-team-name">'+e.strHomeTeam+'</span><span class="card-score basketball">'+(e.intHomeScore??'')+' - '+(e.intAwayScore??'')+'</span><span class="card-team-name right">'+e.strAwayTeam+'</span></div><div class="card-venue">'+(e.strVenue||'')+' '+formatDate(e.dateEvent)+'</div></div>').join('')+'</div>'}catch(e){document.getElementById('basketball-matches').innerHTML=errorBox('No se pudieron cargar.')}}
+async function loadBasketballNext(){try{const r=await fetch(API+'/eventsnextleague.php?id=4387');const data=await r.json();const events=(data.events||[]).slice(0,6);if(!events.length)throw new Error();document.getElementById('basketball-next').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title basketball">NBA</span><span class="widget-sub">Próximos</span></div>'+events.map(e=>'<div class="next-item"><div class="next-teams">'+e.strHomeTeam+'<span>vs</span>'+e.strAwayTeam+'</div><div class="next-date"><strong>'+formatTime(e.dateEvent,e.strTime)+'</strong>'+formatDate(e.dateEvent)+'</div></div>').join('')+'</div>'}catch(e){document.getElementById('basketball-next').innerHTML=errorBox('No se pudieron cargar.')}}
+async function loadBasketballStandings(){try{const r=await fetch(API+'/lookuptable.php?l=4387');const data=await r.json();const table=(data.table||[]).slice(0,8);if(!table.length)throw new Error();document.getElementById('basketball-standings').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title basketball">NBA</span><span class="widget-sub">Clasificación</span></div><div class="standings-head"><span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>P</span><span>Pts</span></div>'+table.map((t,i)=>'<div class="standing-row '+(i<4?'top-b':'')+'"><span class="rk">'+t.intRank+'</span><span class="club">'+t.strTeam+'</span><span>'+t.intPlayed+'</span><span>'+t.intWin+'</span><span>'+t.intLoss+'</span><span class="pts-b">'+t.intPoints+'</span></div>').join('')+'</div>'}catch(e){document.getElementById('basketball-standings').innerHTML=errorBox('No se pudo cargar.')}}
+async function loadBasketballPlayers(){try{const r=await fetch(API+'/lookup_all_players.php?id=134880');const data=await r.json();const players=(data.player||[]).slice(0,5);if(!players.length)throw new Error();document.getElementById('basketball-players').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title basketball">Jugadores</span><span class="widget-sub">LA Lakers</span></div>'+players.map((p,i)=>'<div class="scorer-item"><span class="scorer-rank '+(i<2?'top-b':'dim')+'">'+(i+1)+'</span><div class="scorer-avatar">'+initials(p.strPlayer)+'</div><div class="scorer-info"><div class="scorer-name">'+p.strPlayer+'</div><div class="scorer-club">'+(p.strPosition||'')+' '+(p.strNationality||'')+'</div></div><div class="scorer-stat"><span class="num b">'+(p.strNumber||'-')+'</span><span class="lbl">dorsal</span></div></div>').join('')+'</div>'}catch(e){document.getElementById('basketball-players').innerHTML=errorBox('No se pudieron cargar.')}}
+async function loadAll(){await Promise.all([loadFootballMatches(),loadFootballNext(),loadFootballStandings(),loadFootballPlayers(),loadBasketballMatches(),loadBasketballNext(),loadBasketballStandings(),loadBasketballPlayers()]);const now=new Date();document.getElementById('updated-bar').textContent='Actualizado: '+now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}
+loadAll();setInterval(loadAll,120000);
+</script>
+</body>
+</html>
 
