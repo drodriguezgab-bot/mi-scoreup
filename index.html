@@ -3,95 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SCOREUP</title>
+<title>SCOREUP — Fútbol & Baloncesto</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#121418;--surface:#1c1f26;--surface2:#22252e;--border:rgba(255,255,255,0.08);--orange:#f56f2c;--blue:#3b82f6;--green:#22c55e;--red:#ef4444;--text:#f0f0f0;--muted:#7a7f8e;--muted2:#454a58}
-body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;padding-bottom:70px}
 header{position:sticky;top:0;z-index:200;background:rgba(18,20,24,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;padding:0 1.5rem;gap:2rem}
 .logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none}
 .logo-s{color:var(--orange)}.logo-rest{color:var(--text)}
 .live-indicator{display:flex;align-items:center;gap:0.4rem;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);margin-left:auto}
 .live-dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:blink 1s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-.sport-tabs{display:flex;padding:1rem 1.5rem 0;border-bottom:1px solid var(--border)}
-.sport-tab{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:0.6rem 1.5rem;cursor:pointer;border-bottom:3px solid transparent;transition:color 0.2s,border-color 0.2s;position:relative;top:1px;user-select:none}
-.sport-tab.active.football{color:var(--orange);border-bottom-color:var(--orange)}
-.sport-tab.active.basketball{color:var(--blue);border-bottom-color:var(--blue)}
-.main{max-width:1300px;margin:0 auto;padding:1.5rem;display:grid;grid-template-columns:1fr 320px;gap:1.5rem}
-.col-left{display:flex;flex-direction:column;gap:1.5rem}
-.col-right{display:flex;flex-direction:column;gap:1.5rem}
-.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem}
-.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase}
-.sec-title span.football{color:var(--orange)}.sec-title span.basketball{color:var(--blue)}
+.sport-switch{display:flex;gap:0.5rem;padding:1rem 1rem 0}
+.sport-btn{font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.2s}
+.sport-btn.active-f{background:rgba(245,111,44,0.15);border-color:var(--orange);color:var(--orange)}
+.sport-btn.active-b{background:rgba(59,130,246,0.15);border-color:var(--blue);color:var(--blue)}
+.league-tabs{display:flex;overflow-x:auto;padding:0.8rem 1rem 0;border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.league-tabs::-webkit-scrollbar{display:none}
+.league-tab{font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);padding:0.5rem 1rem;cursor:pointer;border-bottom:3px solid transparent;transition:color 0.2s,border-color 0.2s;position:relative;top:1px;white-space:nowrap;user-select:none}
+.league-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.main{max-width:900px;margin:0 auto;padding:1rem}
+.view-tabs{display:flex;gap:0.3rem;margin-bottom:1rem}
+.view-tab{font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 0.8rem;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.2s}
+.view-tab.active{background:rgba(245,111,44,0.15);border-color:var(--orange);color:var(--orange)}
 .loading-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite}
-.spinner.blue{border-top-color:var(--blue)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
 .error-box{background:var(--surface);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:2rem;text-align:center}
 .error-box p{color:var(--muted);font-size:0.82rem;line-height:1.6}
 .error-box strong{color:var(--red);display:block;margin-bottom:0.5rem}
-.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
-.match-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem;cursor:pointer;transition:border-color 0.25s,transform 0.25s;position:relative;overflow:hidden}
-.match-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;opacity:0;transition:opacity 0.25s}
-.match-card.football::before{background:var(--orange)}.match-card.basketball::before{background:var(--blue)}
-.match-card:hover{transform:translateY(-2px)}
-.match-card.football:hover{border-color:rgba(245,111,44,0.35)}
-.match-card.basketball:hover{border-color:rgba(59,130,246,0.35)}
+.cards-list{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem}
+.match-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;cursor:pointer;transition:border-color 0.25s,transform 0.25s;position:relative;overflow:hidden}
+.match-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;opacity:0;transition:opacity 0.25s;background:var(--orange)}
+.match-card:hover{transform:translateY(-1px);border-color:rgba(245,111,44,0.3)}
 .match-card:hover::before{opacity:1}
-.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem}
+.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem}
 .card-comp{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
 .card-status{font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.45rem;border-radius:3px}
 .card-status.live{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.25)}
 .card-status.ft{background:rgba(122,127,142,0.1);color:var(--muted)}
 .card-status.upcoming{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
+.card-status.halftime{background:rgba(245,111,44,0.15);color:var(--orange);border:1px solid rgba(245,111,44,0.3)}
 .card-match{display:flex;justify-content:space-between;align-items:center;gap:0.5rem}
-.card-team-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.88rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--text);flex:1;line-height:1.2}
-.card-team-name.right{text-align:right}
-.card-score{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.2rem;letter-spacing:0.06em;white-space:nowrap;text-align:center;flex-shrink:0}
-.card-score.football{color:var(--orange)}.card-score.basketball{color:var(--blue)}
-.card-score.upcoming{color:var(--muted2);font-size:0.75rem;font-weight:600}
-.card-venue{font-size:0.6rem;color:var(--muted);font-weight:400;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border)}
-.widget{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.widget-header{padding:0.9rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.widget-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase}
-.widget-title.football{color:var(--orange)}.widget-title.basketball{color:var(--blue)}
-.widget-sub{font-size:0.62rem;color:var(--muted);font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
-.standings-head{display:grid;grid-template-columns:1.5rem 1fr 2rem 2rem 2rem 2.5rem;padding:0.5rem 1.2rem;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);gap:0.4rem}
-.standings-head span{font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);text-align:center}
+.card-team{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--text);flex:1;line-height:1.2}
+.card-team.right{text-align:right}
+.card-score{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.4rem;letter-spacing:0.06em;white-space:nowrap;text-align:center;flex-shrink:0;color:var(--orange)}
+.card-score.upcoming{color:var(--muted2);font-size:0.8rem;font-weight:600}
+.card-minute{font-size:0.62rem;color:var(--red);font-weight:700;text-align:center;margin-top:0.2rem}
+.standings-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem}
+.standings-title{padding:0.9rem 1.2rem;border-bottom:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange)}
+.standings-head{display:grid;grid-template-columns:1.5rem 1fr 2.2rem 2.2rem 2.2rem 2.2rem 2.8rem;padding:0.4rem 1.2rem;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);gap:0.3rem}
+.standings-head span{font-size:0.52rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);text-align:center}
 .standings-head span:nth-child(2){text-align:left}
-.standing-row{display:grid;grid-template-columns:1.5rem 1fr 2rem 2rem 2rem 2.5rem;padding:0.6rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center;gap:0.4rem;transition:background 0.2s;cursor:pointer}
+.standing-row{display:grid;grid-template-columns:1.5rem 1fr 2.2rem 2.2rem 2.2rem 2.2rem 2.8rem;padding:0.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center;gap:0.3rem}
 .standing-row:last-child{border-bottom:none}
-.standing-row:hover{background:rgba(255,255,255,0.03)}
-.standing-row.top-f{border-left:2px solid var(--orange)}.standing-row.top-b{border-left:2px solid var(--blue)}
 .standing-row>*{text-align:center;font-size:0.75rem;color:var(--muted);font-weight:400}
 .standing-row .rk{font-weight:700;color:var(--muted);font-size:0.72rem}
 .standing-row .club{text-align:left;color:var(--text);font-weight:600;font-size:0.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.standing-row .pts-f{color:var(--orange);font-weight:800;font-size:0.82rem}
-.standing-row .pts-b{color:var(--blue);font-weight:800;font-size:0.82rem}
-.scorer-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.2s}
-.scorer-item:last-child{border-bottom:none}
-.scorer-item:hover{background:rgba(255,255,255,0.03)}
-.scorer-rank{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;width:1.4rem;text-align:center}
-.scorer-rank.top-f{color:var(--orange)}.scorer-rank.top-b{color:var(--blue)}.scorer-rank.dim{color:var(--muted2)}
-.scorer-avatar{width:32px;height:32px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.7rem;color:var(--muted);flex-shrink:0;overflow:hidden}
-.scorer-avatar img{width:100%;height:100%;object-fit:cover}
-.scorer-info{flex:1}.scorer-name{font-size:0.8rem;font-weight:600;color:var(--text)}.scorer-club{font-size:0.62rem;color:var(--muted);font-weight:400}
-.scorer-stat{text-align:right}
-.scorer-stat .num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.3rem;display:block}
-.scorer-stat .num.f{color:var(--orange)}.scorer-stat .num.b{color:var(--blue)}
-.scorer-stat .lbl{font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2)}
-.next-item{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.03);gap:0.5rem}
-.next-item:last-child{border-bottom:none}
-.next-teams{font-size:0.78rem;font-weight:600;color:var(--text)}
-.next-teams span{color:var(--muted);font-weight:400;margin:0 0.3rem}
-.next-date{font-size:0.65rem;color:var(--muted);text-align:right}
-.next-date strong{display:block;color:var(--green);font-size:0.7rem}
-.sport-panel{display:none}.sport-panel.active{display:contents}
-.updated-bar{text-align:center;font-size:0.62rem;color:var(--muted2);padding:0.5rem;letter-spacing:0.06em}
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(18,20,24,0.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:0.6rem 0 0.8rem;z-index:300}
+.standing-row .pts{color:var(--orange);font-weight:800;font-size:0.82rem}
+.standing-row.zone-cl{border-left:2px solid #3b82f6}
+.standing-row.zone-el{border-left:2px solid #22c55e}
+.standing-row.zone-rel{border-left:2px solid var(--red)}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);margin-bottom:0.8rem;margin-top:0.5rem}
+.sec-title span{color:var(--orange)}
+.sec-title span.blue{color:var(--blue)}
+.updated-bar{text-align:center;font-size:0.6rem;color:var(--muted2);padding:0.5rem;letter-spacing:0.06em}
+.bk-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:0.6rem;border-top:2px solid var(--blue)}
+.bk-score{color:var(--blue)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(18,20,24,0.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:0.6rem 0 0.8rem;z-index:300}
 .bottom-nav-inner{display:flex;justify-content:space-around}
 .bn-item{display:flex;flex-direction:column;align-items:center;gap:0.25rem;cursor:pointer;opacity:0.45;transition:opacity 0.2s}
 .bn-item.active{opacity:1}
@@ -100,7 +81,8 @@ header{position:sticky;top:0;z-index:200;background:rgba(18,20,24,0.97);backdrop
 .bn-item.active .bn-icon svg{stroke:var(--orange)}
 .bn-label{font-size:0.5rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text)}
 .bn-item.active .bn-label{color:var(--orange)}
-@media(max-width:900px){.main{grid-template-columns:1fr}.col-right{display:none}.cards-grid{grid-template-columns:1fr}.bottom-nav{display:block}body{padding-bottom:64px}}
+.zone-legend{font-size:0.6rem;color:var(--muted2);padding:0.3rem 0.5rem;display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+.zone-legend span{padding-left:0.4rem}
 </style>
 </head>
 <body>
@@ -108,73 +90,203 @@ header{position:sticky;top:0;z-index:200;background:rgba(18,20,24,0.97);backdrop
   <a class="logo" href="#"><span class="logo-s">S</span><span class="logo-rest">COREUP</span></a>
   <div class="live-indicator"><div class="live-dot"></div>En Vivo</div>
 </header>
-<div class="sport-tabs">
-  <div class="sport-tab football active" onclick="switchSport('football')">Fútbol</div>
-  <div class="sport-tab basketball" onclick="switchSport('basketball')">Baloncesto</div>
+
+<div class="sport-switch">
+  <button class="sport-btn active-f" id="btn-football" onclick="setSport('football')">Fútbol</button>
+  <button class="sport-btn" id="btn-basketball" onclick="setSport('basketball')">Baloncesto</button>
 </div>
-<div class="main">
-  <div class="sport-panel active" id="panel-football">
-    <div class="col-left">
-      <div>
-        <div class="sec-header"><span class="sec-title">Partidos <span class="football">Recientes</span></span></div>
-        <div id="football-matches"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
-      </div>
-      <div>
-        <div class="sec-header"><span class="sec-title">Próximos <span class="football">Partidos</span></span></div>
-        <div id="football-next"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
-      </div>
-    </div>
-    <div class="col-right">
-      <div id="football-standings"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
-      <div id="football-players"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
-    </div>
+
+<div id="section-football">
+  <div class="league-tabs">
+    <div class="league-tab active" onclick="setLeague('PL')" data-league="PL">Premier League</div>
+    <div class="league-tab" onclick="setLeague('PD')" data-league="PD">La Liga</div>
+    <div class="league-tab" onclick="setLeague('SA')" data-league="SA">Serie A</div>
+    <div class="league-tab" onclick="setLeague('BL1')" data-league="BL1">Bundesliga</div>
+    <div class="league-tab" onclick="setLeague('FL1')" data-league="FL1">Ligue 1</div>
   </div>
-  <div class="sport-panel" id="panel-basketball">
-    <div class="col-left">
-      <div>
-        <div class="sec-header"><span class="sec-title">Partidos <span class="basketball">Recientes</span></span></div>
-        <div id="basketball-matches"><div class="loading-box"><div class="spinner blue"></div><div class="loading-text">Cargando...</div></div></div>
-      </div>
-      <div>
-        <div class="sec-header"><span class="sec-title">Próximos <span class="basketball">Partidos</span></span></div>
-        <div id="basketball-next"><div class="loading-box"><div class="spinner blue"></div><div class="loading-text">Cargando...</div></div></div>
-      </div>
+  <div class="main">
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="setView('matches')" id="vtab-matches">Partidos</div>
+      <div class="view-tab" onclick="setView('standings')" id="vtab-standings">Clasificación</div>
     </div>
-    <div class="col-right">
-      <div id="basketball-standings"><div class="loading-box"><div class="spinner blue"></div><div class="loading-text">Cargando...</div></div></div>
-      <div id="basketball-players"><div class="loading-box"><div class="spinner blue"></div><div class="loading-text">Cargando...</div></div></div>
+    <div id="matches-view">
+      <div class="sec-title">Partidos <span>Recientes</span></div>
+      <div id="recent-matches"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
+      <div class="sec-title">Próximos <span>Partidos</span></div>
+      <div id="next-matches"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div></div>
     </div>
+    <div id="standings-view" style="display:none">
+      <div id="standings-content"><div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando tabla...</div></div></div>
+    </div>
+    <div class="updated-bar" id="updated-bar"></div>
   </div>
 </div>
-<div class="updated-bar" id="updated-bar"></div>
+
+<div id="section-basketball" style="display:none">
+  <div class="main">
+    <div class="sec-title">Baloncesto <span class="blue">NBA</span></div>
+    <div id="basketball-content"><div class="loading-box"><div class="spinner" style="border-top-color:var(--blue)"></div><div class="loading-text">Cargando...</div></div></div>
+  </div>
+</div>
+
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
-    <div class="bn-item active"><div class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div><div class="bn-label">En Vivo</div></div>
-    <div class="bn-item"><div class="bn-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div class="bn-label">Resultados</div></div>
-    <div class="bn-item"><div class="bn-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><div class="bn-label">Stats</div></div>
-    <div class="bn-item"><div class="bn-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="bn-label">Favoritos</div></div>
-    <div class="bn-item"><div class="bn-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="bn-label">Perfil</div></div>
+    <div class="bn-item active" id="bn-partidos" onclick="navClick('partidos')">
+      <div class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+      <div class="bn-label">Partidos</div>
+    </div>
+    <div class="bn-item" id="bn-tabla" onclick="navClick('tabla')">
+      <div class="bn-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+      <div class="bn-label">Tabla</div>
+    </div>
+    <div class="bn-item" id="bn-futbol" onclick="navClick('futbol')">
+      <div class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8l2 4-2 4-2-4 2-4z"/></svg></div>
+      <div class="bn-label">Fútbol</div>
+    </div>
+    <div class="bn-item" id="bn-basket" onclick="navClick('basket')">
+      <div class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93a10 10 0 0114.14 14.14M4.93 19.07A10 10 0 0119.07 4.93"/></svg></div>
+      <div class="bn-label">Basket</div>
+    </div>
+    <div class="bn-item" id="bn-actualizar" onclick="navClick('actualizar')">
+      <div class="bn-icon"><svg viewBox="0 0 24 24"><path d="M4 4v5h5M20 20v-5h-5"/><path d="M4 9a9 9 0 0115-3.4L20 9M20 15a9 9 0 01-15 3.4L4 15"/></svg></div>
+      <div class="bn-label">Actualizar</div>
+    </div>
   </div>
 </nav>
 <script>
-const API='https://www.thesportsdb.com/api/v1/json/123';
-function switchSport(sport){document.querySelectorAll('.sport-tab').forEach(t=>t.classList.remove('active'));document.querySelector('.sport-tab.'+sport).classList.add('active');document.querySelectorAll('.sport-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-'+sport).classList.add('active')}
+const API_KEY='e91bcb8c7aaa475cae2953d3b035ec43';
+const BASE='https://api.football-data.org/v4';
+let currentLeague='PL';
+let currentView='matches';
+let currentSport='football';
+const LEAGUE_NAMES={PL:'Premier League',PD:'La Liga',SA:'Serie A',BL1:'Bundesliga',FL1:'Ligue 1'};
+
+function navClick(btn){
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bn-'+btn).classList.add('active');
+  if(btn==='partidos'){setSport('football');setView('matches')}
+  else if(btn==='tabla'){setSport('football');setView('standings')}
+  else if(btn==='futbol'){setSport('football');setView('matches')}
+  else if(btn==='basket'){setSport('basketball')}
+  else if(btn==='actualizar'){
+    if(currentSport==='football'){loadLeague(currentLeague);if(currentView==='standings')loadStandings(currentLeague)}
+    else loadBasketball();
+    const btn2=document.getElementById('bn-actualizar');
+    btn2.style.opacity='1';
+    setTimeout(()=>btn2.style.opacity='',500);
+  }
+}
+
+function setSport(sport){
+  currentSport=sport;
+  document.getElementById('section-football').style.display=sport==='football'?'block':'none';
+  document.getElementById('section-basketball').style.display=sport==='basketball'?'block':'none';
+  document.getElementById('btn-football').className='sport-btn'+(sport==='football'?' active-f':'');
+  document.getElementById('btn-basketball').className='sport-btn'+(sport==='basketball'?' active-b':'');
+  if(sport==='basketball')loadBasketball();
+}
+
+function setLeague(code){
+  currentLeague=code;
+  document.querySelectorAll('.league-tab').forEach(t=>t.classList.toggle('active',t.dataset.league===code));
+  loadLeague(code);
+}
+
+function setView(view){
+  currentView=view;
+  document.getElementById('matches-view').style.display=view==='matches'?'block':'none';
+  document.getElementById('standings-view').style.display=view==='standings'?'block':'none';
+  document.getElementById('vtab-matches').classList.toggle('active',view==='matches');
+  document.getElementById('vtab-standings').classList.toggle('active',view==='standings');
+  if(view==='standings')loadStandings(currentLeague);
+}
+
 function formatDate(str){if(!str)return'';const d=new Date(str);return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'})}
-function formatTime(dateStr,timeStr){if(!dateStr)return'';const dt=new Date(dateStr+'T'+(timeStr||'00:00:00')+'Z');return dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Madrid'})}
-function initials(name){if(!name)return'?';return name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()}
-function statusBadge(status,time,dateStr){if(status==='Match Finished')return'<span class="card-status ft">Fin.</span>';if(status==='In Progress'||status==='HT')return'<span class="card-status live">'+(status==='HT'?'HT':'En vivo')+'</span>';const t=formatTime(dateStr,time);return'<span class="card-status upcoming">'+(t||'Próximo')+'</span>'}
-function errorBox(msg){return'<div class="error-box"><p><strong>Sin datos</strong>'+msg+'</p></div>'}
-async function loadFootballMatches(){try{const r=await fetch(API+'/eventspastleague.php?id=4328');const data=await r.json();const events=(data.events||[]).slice(-8).reverse();if(!events.length)throw new Error();document.getElementById('football-matches').innerHTML='<div class="cards-grid">'+events.map(e=>'<div class="match-card football"><div class="card-top"><span class="card-comp">'+( e.strLeague||'Premier League')+'</span>'+statusBadge(e.strStatus,e.strTime,e.dateEvent)+'</div><div class="card-match"><span class="card-team-name">'+e.strHomeTeam+'</span><span class="card-score football">'+(e.intHomeScore??'')+' - '+(e.intAwayScore??'')+'</span><span class="card-team-name right">'+e.strAwayTeam+'</span></div><div class="card-venue">'+(e.strVenue||'')+' '+formatDate(e.dateEvent)+'</div></div>').join('')+'</div>'}catch(e){document.getElementById('football-matches').innerHTML=errorBox('No se pudieron cargar los partidos.')}}
-async function loadFootballNext(){try{const r=await fetch(API+'/eventsnextleague.php?id=4328');const data=await r.json();const events=(data.events||[]).slice(0,6);if(!events.length)throw new Error();document.getElementById('football-next').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title football">Premier League</span><span class="widget-sub">Próximos</span></div>'+events.map(e=>'<div class="next-item"><div class="next-teams">'+e.strHomeTeam+'<span>vs</span>'+e.strAwayTeam+'</div><div class="next-date"><strong>'+formatTime(e.dateEvent,e.strTime)+'</strong>'+formatDate(e.dateEvent)+'</div></div>').join('')+'</div>'}catch(e){document.getElementById('football-next').innerHTML=errorBox('No se pudieron cargar.')}}
-async function loadFootballStandings(){try{const r=await fetch(API+'/lookuptable.php?l=4328');const data=await r.json();const table=(data.table||[]).slice(0,8);if(!table.length)throw new Error();document.getElementById('football-standings').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title football">Premier League</span><span class="widget-sub">Clasificación</span></div><div class="standings-head"><span>#</span><span>Club</span><span>PJ</span><span>G</span><span>P</span><span>Pts</span></div>'+table.map((t,i)=>'<div class="standing-row '+(i<4?'top-f':'')+'"><span class="rk">'+t.intRank+'</span><span class="club">'+t.strTeam+'</span><span>'+t.intPlayed+'</span><span>'+t.intWin+'</span><span>'+t.intLoss+'</span><span class="pts-f">'+t.intPoints+'</span></div>').join('')+'</div>'}catch(e){document.getElementById('football-standings').innerHTML=errorBox('No se pudo cargar la tabla.')}}
-async function loadFootballPlayers(){try{const r=await fetch(API+'/lookup_all_players.php?id=133604');const data=await r.json();const players=(data.player||[]).filter(p=>p.strPosition&&p.strPosition!=='Goalkeeper').slice(0,5);if(!players.length)throw new Error();document.getElementById('football-players').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title football">Jugadores</span><span class="widget-sub">Arsenal FC</span></div>'+players.map((p,i)=>'<div class="scorer-item"><span class="scorer-rank '+(i<2?'top-f':'dim')+'">'+(i+1)+'</span><div class="scorer-avatar">'+initials(p.strPlayer)+'</div><div class="scorer-info"><div class="scorer-name">'+p.strPlayer+'</div><div class="scorer-club">'+(p.strPosition||'')+' '+(p.strNationality||'')+'</div></div><div class="scorer-stat"><span class="num f">'+(p.strNumber||'-')+'</span><span class="lbl">dorsal</span></div></div>').join('')+'</div>'}catch(e){document.getElementById('football-players').innerHTML=errorBox('No se pudieron cargar.')}}
-async function loadBasketballMatches(){try{const r=await fetch(API+'/eventspastleague.php?id=4387');const data=await r.json();const events=(data.events||[]).slice(-8).reverse();if(!events.length)throw new Error();document.getElementById('basketball-matches').innerHTML='<div class="cards-grid">'+events.map(e=>'<div class="match-card basketball"><div class="card-top"><span class="card-comp">NBA</span>'+statusBadge(e.strStatus,e.strTime,e.dateEvent)+'</div><div class="card-match"><span class="card-team-name">'+e.strHomeTeam+'</span><span class="card-score basketball">'+(e.intHomeScore??'')+' - '+(e.intAwayScore??'')+'</span><span class="card-team-name right">'+e.strAwayTeam+'</span></div><div class="card-venue">'+(e.strVenue||'')+' '+formatDate(e.dateEvent)+'</div></div>').join('')+'</div>'}catch(e){document.getElementById('basketball-matches').innerHTML=errorBox('No se pudieron cargar.')}}
-async function loadBasketballNext(){try{const r=await fetch(API+'/eventsnextleague.php?id=4387');const data=await r.json();const events=(data.events||[]).slice(0,6);if(!events.length)throw new Error();document.getElementById('basketball-next').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title basketball">NBA</span><span class="widget-sub">Próximos</span></div>'+events.map(e=>'<div class="next-item"><div class="next-teams">'+e.strHomeTeam+'<span>vs</span>'+e.strAwayTeam+'</div><div class="next-date"><strong>'+formatTime(e.dateEvent,e.strTime)+'</strong>'+formatDate(e.dateEvent)+'</div></div>').join('')+'</div>'}catch(e){document.getElementById('basketball-next').innerHTML=errorBox('No se pudieron cargar.')}}
-async function loadBasketballStandings(){try{const r=await fetch(API+'/lookuptable.php?l=4387');const data=await r.json();const table=(data.table||[]).slice(0,8);if(!table.length)throw new Error();document.getElementById('basketball-standings').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title basketball">NBA</span><span class="widget-sub">Clasificación</span></div><div class="standings-head"><span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>P</span><span>Pts</span></div>'+table.map((t,i)=>'<div class="standing-row '+(i<4?'top-b':'')+'"><span class="rk">'+t.intRank+'</span><span class="club">'+t.strTeam+'</span><span>'+t.intPlayed+'</span><span>'+t.intWin+'</span><span>'+t.intLoss+'</span><span class="pts-b">'+t.intPoints+'</span></div>').join('')+'</div>'}catch(e){document.getElementById('basketball-standings').innerHTML=errorBox('No se pudo cargar.')}}
-async function loadBasketballPlayers(){try{const r=await fetch(API+'/lookup_all_players.php?id=134880');const data=await r.json();const players=(data.player||[]).slice(0,5);if(!players.length)throw new Error();document.getElementById('basketball-players').innerHTML='<div class="widget"><div class="widget-header"><span class="widget-title basketball">Jugadores</span><span class="widget-sub">LA Lakers</span></div>'+players.map((p,i)=>'<div class="scorer-item"><span class="scorer-rank '+(i<2?'top-b':'dim')+'">'+(i+1)+'</span><div class="scorer-avatar">'+initials(p.strPlayer)+'</div><div class="scorer-info"><div class="scorer-name">'+p.strPlayer+'</div><div class="scorer-club">'+(p.strPosition||'')+' '+(p.strNationality||'')+'</div></div><div class="scorer-stat"><span class="num b">'+(p.strNumber||'-')+'</span><span class="lbl">dorsal</span></div></div>').join('')+'</div>'}catch(e){document.getElementById('basketball-players').innerHTML=errorBox('No se pudieron cargar.')}}
-async function loadAll(){await Promise.all([loadFootballMatches(),loadFootballNext(),loadFootballStandings(),loadFootballPlayers(),loadBasketballMatches(),loadBasketballNext(),loadBasketballStandings(),loadBasketballPlayers()]);const now=new Date();document.getElementById('updated-bar').textContent='Actualizado: '+now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}
-loadAll();setInterval(loadAll,120000);
+function formatTime(str){if(!str)return'';const d=new Date(str);return d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}
+
+function statusBadge(m){
+  const s=m.status;
+  if(s==='FINISHED')return'<span class="card-status ft">Finalizado</span>';
+  if(s==='IN_PLAY')return'<span class="card-status live">En vivo '+(m.minute?m.minute+"'":'')+'</span>';
+  if(s==='PAUSED')return'<span class="card-status halftime">Descanso</span>';
+  if(s==='TIMED'||s==='SCHEDULED')return'<span class="card-status upcoming">'+formatTime(m.utcDate)+'</span>';
+  return'<span class="card-status ft">'+s+'</span>';
+}
+
+function scoreDisplay(m){
+  const s=m.status;
+  if(s==='TIMED'||s==='SCHEDULED')return'<div class="card-score upcoming">'+formatDate(m.utcDate)+'</div>';
+  const h=m.score?.fullTime?.home??m.score?.halfTime?.home??'-';
+  const a=m.score?.fullTime?.away??m.score?.halfTime?.away??'-';
+  const min=m.minute?'<div class="card-minute">'+m.minute+"'</div>":'';
+  return'<div><div class="card-score">'+h+' - '+a+'</div>'+min+'</div>';
+}
+
+function renderMatches(matches,id){
+  if(!matches||!matches.length){document.getElementById(id).innerHTML='<div class="error-box"><p><strong>Sin partidos</strong>No hay partidos disponibles.</p></div>';return}
+  document.getElementById(id).innerHTML='<div class="cards-list">'+matches.map(m=>'<div class="match-card"><div class="card-top"><span class="card-comp">'+(m.competition?.name||'')+' · '+(m.matchday?'J'+m.matchday:'')+'</span>'+statusBadge(m)+'</div><div class="card-match"><span class="card-team">'+(m.homeTeam.shortName||m.homeTeam.name)+'</span>'+scoreDisplay(m)+'<span class="card-team right">'+(m.awayTeam.shortName||m.awayTeam.name)+'</span></div></div>').join('')+'</div>';
+}
+
+async function loadLeague(code){
+  document.getElementById('recent-matches').innerHTML='<div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando partidos...</div></div>';
+  document.getElementById('next-matches').innerHTML='<div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div>';
+  try{
+    const r1=await fetch(BASE+'/competitions/'+code+'/matches?status=FINISHED&limit=6',{headers:{'X-Auth-Token':API_KEY}});
+    const d1=await r1.json();
+    renderMatches((d1.matches||[]).slice(-6).reverse(),'recent-matches');
+    const r2=await fetch(BASE+'/competitions/'+code+'/matches?status=IN_PLAY,PAUSED,TIMED,SCHEDULED&limit=8',{headers:{'X-Auth-Token':API_KEY}});
+    const d2=await r2.json();
+    renderMatches((d2.matches||[]).slice(0,8),'next-matches');
+    const now=new Date();
+    document.getElementById('updated-bar').textContent='Actualizado: '+now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    document.getElementById('recent-matches').innerHTML='<div class="error-box"><p><strong>Error</strong>No se pudieron cargar los partidos.</p></div>';
+    document.getElementById('next-matches').innerHTML='';
+  }
+}
+
+async function loadStandings(code){
+  document.getElementById('standings-content').innerHTML='<div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando tabla...</div></div>';
+  try{
+    const r=await fetch(BASE+'/competitions/'+code+'/standings',{headers:{'X-Auth-Token':API_KEY}});
+    const data=await r.json();
+    const table=data.standings?.[0]?.table||[];
+    if(!table.length)throw new Error();
+    const total=table.length;
+    document.getElementById('standings-content').innerHTML=
+      '<div class="standings-card"><div class="standings-title">'+LEAGUE_NAMES[code]+'</div><div class="standings-head"><span>#</span><span>Club</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>Pts</span></div>'+
+      table.map(t=>{
+        let zone='';
+        if(t.position<=4)zone='zone-cl';
+        else if(t.position===5||t.position===6)zone='zone-el';
+        else if(t.position>=total-2)zone='zone-rel';
+        return'<div class="standing-row '+zone+'"><span class="rk">'+t.position+'</span><span class="club">'+(t.team.shortName||t.team.name)+'</span><span>'+t.playedGames+'</span><span>'+t.won+'</span><span>'+t.draw+'</span><span>'+t.lost+'</span><span class="pts">'+t.points+'</span></div>';
+      }).join('')+'</div>'+
+      '<div class="zone-legend"><span style="border-left:2px solid #3b82f6">Champions League</span><span style="border-left:2px solid #22c55e">Europa League</span><span style="border-left:2px solid var(--red)">Descenso</span></div>';
+  }catch(e){
+    document.getElementById('standings-content').innerHTML='<div class="error-box"><p><strong>Error</strong>No se pudo cargar la clasificación.</p></div>';
+  }
+}
+
+async function loadBasketball(){
+  const el=document.getElementById('basketball-content');
+  el.innerHTML='<div class="loading-box"><div class="spinner" style="border-top-color:var(--blue)"></div><div class="loading-text">Cargando NBA...</div></div>';
+  try{
+    const r=await fetch('https://www.thesportsdb.com/api/v1/json/123/eventspastleague.php?id=4387');
+    const data=await r.json();
+    const events=(data.events||[]).slice(-8).reverse();
+    if(!events.length)throw new Error();
+    el.innerHTML=events.map(e=>'<div class="bk-card"><div class="card-top"><span class="card-comp">NBA</span><span class="card-status ft">Finalizado</span></div><div class="card-match"><span class="card-team">'+e.strHomeTeam+'</span><span class="card-score bk-score">'+(e.intHomeScore??'-')+' - '+(e.intAwayScore??'-')+'</span><span class="card-team right">'+e.strAwayTeam+'</span></div></div>').join('');
+  }catch(e){
+    el.innerHTML='<div class="error-box"><p><strong>Error</strong>No se pudieron cargar los partidos de baloncesto.</p></div>';
+  }
+}
+
+loadLeague(currentLeague);
+setInterval(()=>{
+  if(currentSport==='football'){loadLeague(currentLeague);if(currentView==='standings')loadStandings(currentLeague);}
+  else loadBasketball();
+},60000);
 </script>
 </body>
 </html>
-
