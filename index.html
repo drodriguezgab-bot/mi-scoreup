@@ -140,7 +140,7 @@ header{position:sticky;top:0;z-index:200;background:rgba(18,20,24,0.97);backdrop
       <div class="bn-label">Tabla</div>
     </div>
     <div class="bn-item" id="bn-futbol" onclick="navClick('futbol')">
-      <div class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8l2 4-2 4-2-4 2-4z"/></svg></div>
+      <div class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8l2 4-2 4-2-4 2-4z"/></svg></div>
       <div class="bn-label">Fútbol</div>
     </div>
     <div class="bn-item" id="bn-basket" onclick="navClick('basket')">
@@ -155,6 +155,7 @@ header{position:sticky;top:0;z-index:200;background:rgba(18,20,24,0.97);backdrop
 </nav>
 <script>
 const API_KEY='e91bcb8c7aaa475cae2953d3b035ec43';
+const PROXY='https://corsproxy.io/?';
 const BASE='https://api.football-data.org/v4';
 let currentLeague='PL';
 let currentView='matches';
@@ -171,9 +172,6 @@ function navClick(btn){
   else if(btn==='actualizar'){
     if(currentSport==='football'){loadLeague(currentLeague);if(currentView==='standings')loadStandings(currentLeague)}
     else loadBasketball();
-    const btn2=document.getElementById('bn-actualizar');
-    btn2.style.opacity='1';
-    setTimeout(()=>btn2.style.opacity='',500);
   }
 }
 
@@ -224,23 +222,26 @@ function scoreDisplay(m){
 
 function renderMatches(matches,id){
   if(!matches||!matches.length){document.getElementById(id).innerHTML='<div class="error-box"><p><strong>Sin partidos</strong>No hay partidos disponibles.</p></div>';return}
-  document.getElementById(id).innerHTML='<div class="cards-list">'+matches.map(m=>'<div class="match-card"><div class="card-top"><span class="card-comp">'+(m.competition?.name||'')+' · '+(m.matchday?'J'+m.matchday:'')+'</span>'+statusBadge(m)+'</div><div class="card-match"><span class="card-team">'+(m.homeTeam.shortName||m.homeTeam.name)+'</span>'+scoreDisplay(m)+'<span class="card-team right">'+(m.awayTeam.shortName||m.awayTeam.name)+'</span></div></div>').join('')+'</div>';
+  document.getElementById(id).innerHTML='<div class="cards-list">'+matches.map(m=>'<div class="match-card"><div class="card-top"><span class="card-comp">'+(m.competition?.name||'')+' J'+(m.matchday||'')+'</span>'+statusBadge(m)+'</div><div class="card-match"><span class="card-team">'+(m.homeTeam.shortName||m.homeTeam.name)+'</span>'+scoreDisplay(m)+'<span class="card-team right">'+(m.awayTeam.shortName||m.awayTeam.name)+'</span></div></div>').join('')+'</div>';
+}
+
+async function fetchAPI(url){
+  const res=await fetch(PROXY+encodeURIComponent(url),{headers:{'X-Auth-Token':API_KEY}});
+  return res.json();
 }
 
 async function loadLeague(code){
   document.getElementById('recent-matches').innerHTML='<div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando partidos...</div></div>';
   document.getElementById('next-matches').innerHTML='<div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando...</div></div>';
   try{
-    const r1=await fetch(BASE+'/competitions/'+code+'/matches?status=FINISHED&limit=6',{headers:{'X-Auth-Token':API_KEY}});
-    const d1=await r1.json();
+    const d1=await fetchAPI(BASE+'/competitions/'+code+'/matches?status=FINISHED&limit=6');
     renderMatches((d1.matches||[]).slice(-6).reverse(),'recent-matches');
-    const r2=await fetch(BASE+'/competitions/'+code+'/matches?status=IN_PLAY,PAUSED,TIMED,SCHEDULED&limit=8',{headers:{'X-Auth-Token':API_KEY}});
-    const d2=await r2.json();
+    const d2=await fetchAPI(BASE+'/competitions/'+code+'/matches?status=IN_PLAY,PAUSED,TIMED,SCHEDULED&limit=8');
     renderMatches((d2.matches||[]).slice(0,8),'next-matches');
     const now=new Date();
     document.getElementById('updated-bar').textContent='Actualizado: '+now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
-    document.getElementById('recent-matches').innerHTML='<div class="error-box"><p><strong>Error</strong>No se pudieron cargar los partidos.</p></div>';
+    document.getElementById('recent-matches').innerHTML='<div class="error-box"><p><strong>Error</strong>No se pudieron cargar los partidos. Pulsa Actualizar.</p></div>';
     document.getElementById('next-matches').innerHTML='';
   }
 }
@@ -248,8 +249,7 @@ async function loadLeague(code){
 async function loadStandings(code){
   document.getElementById('standings-content').innerHTML='<div class="loading-box"><div class="spinner"></div><div class="loading-text">Cargando tabla...</div></div>';
   try{
-    const r=await fetch(BASE+'/competitions/'+code+'/standings',{headers:{'X-Auth-Token':API_KEY}});
-    const data=await r.json();
+    const data=await fetchAPI(BASE+'/competitions/'+code+'/standings');
     const table=data.standings?.[0]?.table||[];
     if(!table.length)throw new Error();
     const total=table.length;
@@ -262,7 +262,7 @@ async function loadStandings(code){
         else if(t.position>=total-2)zone='zone-rel';
         return'<div class="standing-row '+zone+'"><span class="rk">'+t.position+'</span><span class="club">'+(t.team.shortName||t.team.name)+'</span><span>'+t.playedGames+'</span><span>'+t.won+'</span><span>'+t.draw+'</span><span>'+t.lost+'</span><span class="pts">'+t.points+'</span></div>';
       }).join('')+'</div>'+
-      '<div class="zone-legend"><span style="border-left:2px solid #3b82f6">Champions League</span><span style="border-left:2px solid #22c55e">Europa League</span><span style="border-left:2px solid var(--red)">Descenso</span></div>';
+      '<div class="zone-legend"><span style="border-left:2px solid #3b82f6">Champions</span><span style="border-left:2px solid #22c55e">Europa</span><span style="border-left:2px solid var(--red)">Descenso</span></div>';
   }catch(e){
     document.getElementById('standings-content').innerHTML='<div class="error-box"><p><strong>Error</strong>No se pudo cargar la clasificación.</p></div>';
   }
@@ -278,7 +278,7 @@ async function loadBasketball(){
     if(!events.length)throw new Error();
     el.innerHTML=events.map(e=>'<div class="bk-card"><div class="card-top"><span class="card-comp">NBA</span><span class="card-status ft">Finalizado</span></div><div class="card-match"><span class="card-team">'+e.strHomeTeam+'</span><span class="card-score bk-score">'+(e.intHomeScore??'-')+' - '+(e.intAwayScore??'-')+'</span><span class="card-team right">'+e.strAwayTeam+'</span></div></div>').join('');
   }catch(e){
-    el.innerHTML='<div class="error-box"><p><strong>Error</strong>No se pudieron cargar los partidos de baloncesto.</p></div>';
+    el.innerHTML='<div class="error-box"><p><strong>Error</strong>No se pudieron cargar los partidos.</p></div>';
   }
 }
 
